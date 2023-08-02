@@ -15,7 +15,8 @@ import {
     LINE_COLOR,
     BUTTON_OPACITY_OFF,
     BUTTON_OPACITY_ON,
-    DARK_MODE
+    BACKGROUND_COLOR,
+    NODE_LINE_COLOR
     } from './attributes.js';
 
 // OBJECTS
@@ -43,9 +44,9 @@ function Circle(c, x, y, t, speed, radius, travel_radius, audio){
         // Circle Math
         var sign = 0;
         inReverse ? sign = -1 : sign = 1;
+        this.x = center_x + this.t_radius * Math.cos(this.t);
+        this.y = center_y + this.t_radius * Math.sin(this.t) ;
         if (playing){
-            this.x = center_x + this.t_radius * Math.cos(this.t);
-            this.y = center_y + this.t_radius * Math.sin(this.t) ;
             this.t += Math.PI * this.speed * sign;
         }
         // Detects a collision with tangental lines
@@ -55,7 +56,7 @@ function Circle(c, x, y, t, speed, radius, travel_radius, audio){
             && (this.y < center_y)){ // ABOVE HORIZONTAL
                 event_time = 155;
                 if (soundOn){
-                    this.audio.load();
+                    // this.audio.load();
                     this.audio.play();
                 }
         }
@@ -130,7 +131,8 @@ function shuffle(array){
 function draw_background(){ 
     // Draws rings + tangental lines + black background
     // Blackground 
-    DARK_MODE ? c.fillStyle = 'black' : c.fillStyle = 'white';
+    // BACKGROUND_COLOR ? c.fillStyle = 'black' : c.fillStyle = 'white';
+    c.fillStyle = BACKGROUND_COLOR;
     c.fillRect(0,0,width,height);
     
     // Draw Rings    
@@ -204,6 +206,38 @@ fast_button.addEventListener('click', function(evt){
     speed_multiplier *= 2;
     updateCircleSpeed();
 })
+// STOPS SPACE FROM SCROLLING
+document.onkeydown = (evt) => {
+    if ((evt.keyCode == 32 || evt.keyCode == 37 || evt.keyCode == 39)
+     && evt.target == document.body){
+        evt.preventDefault();
+    }
+}
+document.addEventListener('keyup', (evt) => {
+    switch (evt.code){
+        case "Space":
+            updatePlaying();
+            break;
+        case "KeyM":
+            updateSoundToggle();
+            break;
+        case "ArrowLeft":
+            speed_multiplier *= 0.5;
+            updateCircleSpeed();
+            break;
+        case "ArrowRight":
+            speed_multiplier *= 2;
+            updateCircleSpeed();
+            break;
+        case "KeyR":
+            StartSimulationFromBeginning();
+            break;
+        case "Backspace":
+            updateReverse();
+            break;
+    }
+})
+
 
 // Init global variables ------------------
 var dist_between_rings = 25;
@@ -221,10 +255,16 @@ var soundOn = SOUND_ON;
 var inReverse = false;
 
 function createAudioArray(){
+    var num=1; var goingDown = false;
     for (var i =1; i<=ring_number; i++){
-        var audio = new Audio('mp3/'+i+'.mp3');
+        var audio = new Audio('mp3/'+num+'.mp3');
         audio.volume = VOLUME_MULTIPLIER;
-        if (i<=num_of_audios) audioArray.push(audio);
+
+        if (num==num_of_audios){
+            goingDown = true;
+        }else if (num==1) goingDown = false;
+        goingDown ? num-- : num++;
+        audioArray.push(audio);
     }
 }
 
@@ -278,7 +318,7 @@ function drawLines() {
         var circle = circleArray[i];
         c.lineTo(circle.x, circle.y);
     }
-    c.fillStyle = LINE_COLOR;
+    c.strokeStyle = NODE_LINE_COLOR;
     c.stroke();
 }
 // Animate Function -------------------

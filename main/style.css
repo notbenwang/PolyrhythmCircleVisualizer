@@ -1,0 +1,57 @@
+:root {
+    --top : 15px;
+    --bot : 15px;
+}
+
+canvas {
+    border : 1px solid black;
+    /* background : black; */
+}
+body {
+    margin : 0;
+}
+
+/*Upper Buttons*/
+.img_speaker {
+    position: absolute;
+    right : 25px;
+    top : var(--top);
+    opacity: 1;
+}
+.img_slow {
+    position:absolute;
+    left : 25px;
+    top: var(--top);
+    opacity: 1;
+}
+.img_pause {
+    position:absolute;
+    left : 75px;
+    top: var(--top);
+    opacity: 1;
+}
+.img_fast {
+    position:absolute;
+    left : 125px;
+    top: var(--top);
+    opacity: 1;
+}
+.img_rotate {
+    position:absolute;
+    left : 175px;
+    top: var(--top);
+    opacity: 1;
+}
+/*  Lower Buttons */
+.img_shuffle {
+    position: absolute;
+    right : 75px;
+    bottom: var(--bot);
+    opacity: 1;
+}
+.img_reset {
+    position: absolute;
+    right : 25px;
+    bottom : var(--bot);
+    opacity: 1;
+}
