@@ -1,23 +1,22 @@
 // Benjamin "Ben" Wang || hgf3jq@virginia.edu 
 
 // ATTRIBUTES TO CHANGE---------
-var DISTANCE_BETWEEN_RINGS = 25;
-var NUMBER_OF_RINGS = 16;
-var NODE_RADIUS = 8;
-var MAX_AUDIO_FILES = 16;
-var STARTING_ANGLE = Math.PI/-2;
-var SPEED_MULTIPLIER = 0.5;
-
-var VOLUME_MULTIPLIER = 0.5;
-var SOUND_ON = false;
-var SHUFFLE_ON = false;
-
-var RING_COLOR = 'rgba(100,100,255,0.5)';
-var LINE_COLOR = 'rgba(100,100,255,1)';
-var BUTTON_OPACITY_ON = 1.00;
-var BUTTON_OPACITY_OFF = 0.55;
-
-var DARK_MODE = true;
+import {
+    DISTANCE_BETWEEN_RINGS,
+    NUMBER_OF_RINGS,
+    NODE_RADIUS,
+    MAX_AUDIO_FILES,
+    STARTING_ANGLE,
+    SPEED_MULTIPLIER,
+    VOLUME_MULTIPLIER,
+    SOUND_ON,
+    SHUFFLE_ON,
+    RING_COLOR,
+    LINE_COLOR,
+    BUTTON_OPACITY_OFF,
+    BUTTON_OPACITY_ON,
+    DARK_MODE
+    } from './attributes.js';
 
 // OBJECTS
 function Circle(c, x, y, t, speed, radius, travel_radius, audio){
