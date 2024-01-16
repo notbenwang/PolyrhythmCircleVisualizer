@@ -7,12 +7,13 @@ export var MAX_AUDIO_FILES = 16;
 export var STARTING_ANGLE = 16*Math.PI/-24
 export var SPEED_MULTIPLIER = 0.25;
 export var VOLUME_MULTIPLIER = 0.5;
-export var SOUND_ON = true;
+export var SOUND_ON = false;
 export var SHUFFLE_ON = false;
-export var RING_COLOR = 'rgba(100,100,255,0.25)';
-export var LINE_COLOR = 'rgba(100,100,255,0.25)';
+export var RING_COLOR = 'rgba(100,100,255,0.15)';
+export var LINE_COLOR = RING_COLOR;
+export var OUTER_RING = 'rgba(100,100,255,1)';
 export var NODE_LINE_COLOR = 'rgba(100,100,255,1)';
 export var BUTTON_OPACITY_ON = 1.00;
 export var BUTTON_OPACITY_OFF = 0.5
-export var BACKGROUND_COLOR = 'white';
+export var BACKGROUND_COLOR = 'black';
 

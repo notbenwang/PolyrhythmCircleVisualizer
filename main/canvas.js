@@ -16,7 +16,8 @@ import {
     BUTTON_OPACITY_OFF,
     BUTTON_OPACITY_ON,
     BACKGROUND_COLOR,
-    NODE_LINE_COLOR
+    NODE_LINE_COLOR,
+    OUTER_RING
     } from './attributes.js';
 
 // OBJECTS
@@ -55,6 +56,7 @@ function Circle(c, x, y, t, speed, radius, travel_radius, audio){
         if ( (this.x<center_x+percent_error && center_x-percent_error <this.x) // ON VERTICAL
             && (this.y < center_y)){ // ABOVE HORIZONTAL
                 event_time = 155;
+                line_event_time = 155;
                 if (soundOn){
                     // this.audio.load();
                     this.audio.play();
@@ -67,11 +69,18 @@ function Circle(c, x, y, t, speed, radius, travel_radius, audio){
 // HELPER GLOBAL FUNCTIONS
 function get_color(event_time){
     // DEFAULT_COLOR = 'rgba(100,100,255,1)';
+    // Goes from default to rgba(214, 247, 155) 
     var fraction1 = 114/155;
     var fraction2 = 147/155;
     return 'rgba('+(100+fraction1*event_time)+','+ (100+event_time*fraction2) +',255,1)';
 }
-function updatePlaying(){
+function get_line_color(event_time){
+    // Strengthens opacity 
+    var fraction = 0.85*(event_time/155) + 0.15;
+    var color =  'rgba('+(100)+','+ (100) +',255,'+fraction+')';
+    return color;
+}
+function inversePlaying(){
     if (playing === true) {
         playing = false;
         play_button.src = "images/play.png"; 
@@ -81,7 +90,7 @@ function updatePlaying(){
 
     }
 }
-function updateShuffle(){
+function inverseShuffle(){
     if (doShuffle){
         doShuffle = false;
         shuffle_button.style.opacity = BUTTON_OPACITY_OFF;
@@ -90,7 +99,7 @@ function updateShuffle(){
         shuffle_button.style.opacity = BUTTON_OPACITY_ON;
     }
 }
-function updateSoundToggle(){
+function inverseSound(){
     if (soundOn){
         soundOn = false;
         sound_button.style.opacity = BUTTON_OPACITY_OFF;
@@ -107,13 +116,17 @@ function updateCircleSpeed(){
         circle.speed = (ring_number + 13 - i) * speed_multiplier / (16000);
     }
 }
-function updateReverse(){
-    if (inReverse) {
-        inReverse = false;
-        rotate_button.src ="images/clockwise.png";
-    } else {
-        inReverse = true;
-        rotate_button.src ="images/counterclockwise.png";
+function updateReverse(arg){
+    // If arg == inReverse, do nothing
+    // Else, inverse inReverse var
+    if(arg^inReverse){
+        if (inReverse) {
+            inReverse = false;
+            rotate_button.src ="images/clockwise.png";
+        } else {
+            inReverse = true;
+            rotate_button.src ="images/counterclockwise.png";
+        }
     }
 }
 function shuffle(array){
@@ -130,8 +143,8 @@ function shuffle(array){
 // DRAW FUNCTIONS
 function draw_background(){ 
     // Draws rings + tangental lines + black background
+    
     // Blackground 
-    // BACKGROUND_COLOR ? c.fillStyle = 'black' : c.fillStyle = 'white';
     c.fillStyle = BACKGROUND_COLOR;
     c.fillRect(0,0,width,height);
     
@@ -139,14 +152,15 @@ function draw_background(){
     for (var i = 0; i <= ring_number; i++){
         c.beginPath();
         c.arc(width/2,height/2,i*dist_between_rings,0,Math.PI*2);
-        c.strokeStyle = RING_COLOR;
+        i==ring_number ? c.strokeStyle = OUTER_RING : c.strokeStyle = RING_COLOR;
         c.stroke();
     }
     // Vertical
     c.beginPath();
     c.moveTo(center_x,height/2 - dist_between_rings);
     c.lineTo(center_x,center_y - (ring_number)*dist_between_rings);
-    c.strokeStyle = LINE_COLOR;
+    if (line_event_time!=0) line_event_time--;
+    c.strokeStyle = get_line_color(line_event_time);
     c.stroke();
 }
 function updateCanvas(){ 
@@ -178,11 +192,11 @@ var y = center_y - 100;
 // INIT BUTTONS + EVENT HANDLERs---------------
 var sound_button = document.getElementById('speaker');
 sound_button.addEventListener('click',function(evt){
-    updateSoundToggle();
+    inverseSound();
 })
 var shuffle_button = document.getElementById('shuffle');
 shuffle_button.addEventListener('click', function(evt){
-    updateShuffle();
+    inverseShuffle();
 })
 var reset_button = document.getElementById('reset');
 reset_button.addEventListener('click', function(evt){
@@ -190,11 +204,11 @@ reset_button.addEventListener('click', function(evt){
 })
 var rotate_button = document.getElementById('rotation');
 rotate_button.addEventListener('click', function(evt){
-    updateReverse();
+    updateReverse(!inReverse);
 })
 var play_button = document.getElementById('pause');
 play_button.addEventListener('click', function(evt){
-    updatePlaying();
+    inversePlaying();
 })
 var slow_button = document.getElementById('slow');
 slow_button.addEventListener('click', function(evt){
@@ -206,9 +220,9 @@ fast_button.addEventListener('click', function(evt){
     speed_multiplier *= 2;
     updateCircleSpeed();
 })
-// STOPS SPACE FROM SCROLLING
+// STOP ACCIDENTAL SCROLLING
 document.onkeydown = (evt) => {
-    if ((evt.keyCode == 32 || evt.keyCode == 37 || evt.keyCode == 39)
+    if ((evt.keyCode == 32 || evt.keyCode == 37 || evt.keyCode == 39 || evt.keyCode == 38 || evt.keyCode == 40)
      && evt.target == document.body){
         evt.preventDefault();
     }
@@ -216,24 +230,30 @@ document.onkeydown = (evt) => {
 document.addEventListener('keyup', (evt) => {
     switch (evt.code){
         case "Space":
-            updatePlaying();
+            inversePlaying();
             break;
         case "KeyM":
-            updateSoundToggle();
+            inverseSound();
             break;
-        case "ArrowLeft":
+        case "Comma":
             speed_multiplier *= 0.5;
             updateCircleSpeed();
             break;
-        case "ArrowRight":
+        case "Period":
             speed_multiplier *= 2;
             updateCircleSpeed();
             break;
         case "KeyR":
             StartSimulationFromBeginning();
             break;
-        case "Backspace":
-            updateReverse();
+        case "ArrowLeft":
+            updateReverse(true);
+            break;
+        case "ArrowRight":
+            updateReverse(false);
+            break;
+        case "KeyS":
+            inverseShuffle();
             break;
     }
 })
@@ -243,7 +263,7 @@ document.addEventListener('keyup', (evt) => {
 var dist_between_rings = 25;
 var ring_number = 16;
 var circle_radius = 8;
-var starting_angle = Math.PI/-2;
+var starting_angle = STARTING_ANGLE;
 var num_of_audios = 16;
 var doShuffle = SHUFFLE_ON;
 var speed_multiplier = 1;
@@ -253,13 +273,13 @@ var audioArray = [];
 var circleArray = [];
 var soundOn = SOUND_ON;
 var inReverse = false;
+var line_event_time = 0;
 
 function createAudioArray(){
     var num=1; var goingDown = false;
     for (var i =1; i<=ring_number; i++){
         var audio = new Audio('mp3/'+num+'.mp3');
         audio.volume = VOLUME_MULTIPLIER;
-
         if (num==num_of_audios){
             goingDown = true;
         }else if (num==1) goingDown = false;
@@ -277,11 +297,7 @@ function StartSimulationFromBeginning(){
     num_of_audios = MAX_AUDIO_FILES;
     speed_multiplier = SPEED_MULTIPLIER;
 
-    center_x = width/2;
-    center_y = height/2;
-    x = center_x;
-    y = center_y - 100;
-    t = starting_angle;
+    updateCanvas();
     // Get Audio Files
     audioArray = [];
     createAudioArray();
@@ -304,6 +320,7 @@ function StartSimulationFromBeginning(){
             )
         );
     }
+    // Janky Update Stuff to make sure visuals match system
     if (soundOn === false) {
         sound_button.src = "images/mute.png";
         sound_button.style.opacity = BUTTON_OPACITY_OFF;
@@ -331,7 +348,6 @@ function animate() {
         var circle = circleArray[i];
         circle.update();
     }
-    
 }
 // MAIN LINE ------------------------
 StartSimulationFromBeginning(); 
